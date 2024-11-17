@@ -4,6 +4,9 @@ from bs4 import BeautifulSoup
 import random
 import os
 import html2text
+import tkinter as tk
+
+# TODO: ---------加入GUI----------
 
 # 请求头
 headers = {
@@ -11,9 +14,9 @@ headers = {
 }
 
 # URL地址集
+# TODO：这里没规则暂时手动输入url
 urls = [
     'https://kidscodes.cn/10283.html',
-    'https://kidscodes.cn/3224.html',
 ]
 divs = [
     'b',
@@ -25,6 +28,13 @@ class_ = [
     'post-views-label',
     'post-views-count'
 ]
+#------------------指定从那个标签开始获取内容标签-------------
+# 指定id
+div_id = 'entry-content'
+# 指定标签
+div_type = 'div'
+# 指定标签选择器
+div_check = 'class'
 
 # 遍历每个URL
 for url in urls:
@@ -35,20 +45,15 @@ for url in urls:
     if response.status_code == 200:
         # 解析页面
         soup = BeautifulSoup(response.content, "html.parser")
-        
-        # 获取指定ID的div
-        div_id = "entry-content"
-        div_content = soup.find("div", {'class': div_id})
-
+        div_content = soup.find(div_type, {div_check: div_id})
         if div_content:
-            
             # 清空指定标签内容
             for v in divs:
                 div_tags = div_content.find_all({v})
                 for tag in div_tags:
                     tag.decompose()  # 清空标签内容，但保留标签本身
                 print(f"已成功清空 {len(div_tags)} 个 {v} 标签的内容")
-            
+
             # 去除指定class所在标签内容
             for v2 in class_:
                 class_tags = div_content.find_all(class_ = {v2})
@@ -79,7 +84,7 @@ for url in urls:
             except Exception as e:
                 print(f"写入文件时出错: {e}")
         else:
-            print(f"未找到class为 {div_id} 的<div>元素")
+            print(f"未找到{div_check}为 {div_id} 的{div_type}元素")
         
     else:
         print(f"请求失败，状态码：{response.status_code}")
